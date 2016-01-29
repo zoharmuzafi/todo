@@ -7,7 +7,7 @@ var User = require("./user");
 var TaskSchema = new Schema({
 
 	name:{type: String, required: true}, 
-	completed: Boolean, 
+	completed: {type: Boolean, default: false},
 	subtasks: [Subtask.schema],
 	
 });

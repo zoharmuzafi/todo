@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="todoApp">
+<head>
+	<meta charset="UTF-8">
+	<title>To-Do</title>
+		<base href="/">
+		<!-- bootstrap css -->
+	  <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	  <!-- custom styles -->
+	  <link rel="stylesheet" type="text/css" href="styles/main.css">
+</head>
+<body ng-controller="MainCtrl">
+	<nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">AngularAuth</a>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Home</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li ng-show="!currentUser"><a href="/signup">Sign Up</a></li>
+          <li ng-show="!currentUser"><a href="/login">Log In</a></li>
+          <li ng-show="currentUser"><a href="/profile">\{{currentUser.displayName}}</a></li>
+          <li ng-show="currentUser"><a href="#" ng-click="logout()">Log Out</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+	<div class="container">	
+		<div class="row">
+			<div class="col-md-12">
+				<div ng-view></div>
+			</div><!-- close col-12-->
+		</div> <!-- close row-->
+	</div> <!-- close container-->
+	 <!-- jquery -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+	<!-- bootstrap js -->
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <!-- angular -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.min.js"></script>
+  <!-- ngRoute -->
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.min.js"></script>
+  <!-- angular resource-->
+  <script type="text/javascript" src="//code.angularjs.org/1.4.8/angular-resource.js"></script>
+  <!-- satellizer -->
+  <script src="//cdn.jsdelivr.net/satellizer/0.13.4/satellizer.min.js"></script>
+  <!-- custom script (angular app) -->
+  <script type="text/javascript" src="scripts/app.js"></script>
+</body>
+</html>

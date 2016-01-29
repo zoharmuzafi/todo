@@ -1,9 +1,9 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
-var subtaskSchema = new Schema({
+var SubtaskSchema = new Schema({
 	name:{type: String, required: true},
-	completed: boolean
+	completed: Boolean
 });
 
 var Subtask = mongoose.model('Subtask', SubtaskSchema);

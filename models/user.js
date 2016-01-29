@@ -10,7 +10,7 @@ var userSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   password: { type: String, select: false },
   displayName: String,
-  tasks: {type: Schema.Types.ObjectId,ref:"Task"}
+  tasks: [{type: Schema.Types.ObjectId, ref: "Task"}]
 });
 
 userSchema.pre('save', function (next) {
