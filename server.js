@@ -30,7 +30,13 @@ app.listen(3000, function() {
   console.log('server started');
 });
 
-//auth routs
+/* 
+
+
+    auth routs 
+
+*/
+
 app.post('/auth/signup', function (req, res) {
   User.findOne({ email: req.body.email }, function (err, existingUser) {
     if (existingUser) {
@@ -83,7 +89,16 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
   });
 });
 
-// api routs
+/* 
+
+
+    api routs */
+
+
+/* 
+
+
+    task CRUD routs */
 
 //get all tasks of a user
 app.get('/api/tasks', auth.ensureAuthenticated, function(req,res){
@@ -128,7 +143,7 @@ app.delete('/api/tasks/:id', function(req, res){
 });
 
 //update a task name. didn't user update because it updating the db and returns the old version of the object
-app.patch('/api/tasks/:id', function(req, res){
+app.put('/api/tasks/:id', function(req, res){
   taskId = req.params.id;
   Task.findById(taskId, function(err, foundTask){
     foundTask.name = req.body.name || foundTask.name;
@@ -138,6 +153,62 @@ app.patch('/api/tasks/:id', function(req, res){
     });
   });
 });
+
+/* 
+
+
+    subTask CRUD routs 
+
+  */
+
+//save a new subtask
+app.post('/api/tasks/:taskId/subtasks', function(req, res){
+  taskId = req.params.taskId;
+  Task.findById(taskId, function(err, foundTask){
+    var subtask =  new Subtask({
+      name: req.body.name
+    });
+    foundTask.subtasks.push(subtask);
+    foundTask.save(function(err, savedTask){
+      console.log("saving: " + savedTask);
+      res.json(savedTask);
+    });
+  });
+});
+
+//delete subtask
+app.delete('/api/tasks/:taskId/subtasks/:id', function(req, res){
+  taskId = req.params.taskId;
+  subtaskId = req.params.id;
+  Task.findById(taskId, function(err, foundTask){
+    var foundSubTask = foundTask.subtasks.id(subtaskId); 
+    console.log("found Subtask: " + foundSubTask);
+    foundSubTask.remove();
+    foundTask.save(function(err, savedTask){
+      console.log("deleted: " + savedTask);
+       res.json(savedTask);
+    });
+  });
+});
+
+//update subtask
+app.put('/api/tasks/:taskId/subtasks/:id', function(req, res){
+  taskId = req.params.taskId;
+  subtaskId = req.params.id;
+  Task.findById(taskId, function(err, foundTask){
+    console.log(foundTask);
+    var foundSubTask = foundTask.subtasks.id(subtaskId); 
+    foundSubTask.name = req.body.name || foundSubTask.name;
+    foundSubTask.completed = req.body.completed || foundSubTask.completed;
+    foundTask.save(function(err, savedTask){
+       console.log(err);
+       res.json(foundSubTask);
+
+    });
+  });
+});
+
+
 
 //catch all routes
 app.get('*', function (req, res) {

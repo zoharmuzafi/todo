@@ -1,4 +1,41 @@
 <p>{{currentUser.displayName}}</p>
 <p>{{singleTask.name}}</p>
-<a ng-click="deleteTask()" href=" ">delete</a>
-<a ng-click="updateTask()" href=" ">update</a>
+<h1>search</h1>
+<form ng-submit="search()">
+		<div class="form-group">
+	    <input type="text" ng-model="searchUser" class="form-control" placeholder= "search for a user">
+	  </div>
+	  <input type="submit" value="search" class="btn btn-block btn-info">
+	</form>
+
+<a ng-click="deleteTask()" href="#">delete</a>
+<ul>
+<li ng-repeat = "subtask in singleTask.subtasks">{{subtask.name}}, {{subtask.completed}}, <a ng-click="deleteSubTask(subtask)" href="#">deleteSub</a>
+	<h1>edit subTask</h1>
+	<a ng-click="completeSubTask(subtask)" href="#">Mark As Done</a>
+	<form ng-submit="editSubTask(subtask)">
+		<div class="form-group">
+	    <input type="text" ng-model="subtask.subTaskEdit.name" class="form-control">
+	  </div>
+	  <input type="submit" value="update" class="btn btn-block btn-info">
+	</form>
+
+</li>
+
+</ul>
+
+<form ng-submit="updateTask()">
+	<div class="form-group">
+    <input type="text" ng-model="editTask.name" class="form-control">
+  </div>
+  <input type="submit" value="update" class="btn btn-block btn-info">
+</form>
+
+
+<h1>add new subTask</h1>
+<form ng-submit="addSubTask()">
+	<div class="form-group">
+    <input type="text" ng-model="subTask.name" class="form-control">
+  </div>
+  <input type="submit" value="update" class="btn btn-block btn-info">
+</form>

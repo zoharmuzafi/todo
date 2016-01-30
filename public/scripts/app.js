@@ -39,14 +39,26 @@ app.config(['$routeProvider', '$locationProvider',
   }
 ]);
 
-//resource for api calls
+//resource for task api calls
 app.factory('Task', ['$resource', function($resource) {
   return $resource("/api/tasks/:id", {id: "@_id"}, {
     query: {
       isArray: true
     },
     update: {
-      methood: "PUT"
+      method: "PUT"
+    }
+  });
+}]);
+
+//resource for subtasks api calls
+app.factory('Subtask', ['$resource', function($resource) {
+  return $resource("/api/tasks/:taskId/subtasks/:id", {taskId: "@_id" , id: "@_id"}, {
+    query: {
+      isArray: true
+    },
+    update: {
+      method: "PUT"
     }
   });
 }]);
@@ -103,22 +115,21 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
   };
 
   //login 
-     $scope.login = function() {
-      // login (https://github.com/sahat/satellizer#authloginuser-options)
-      $auth.login($scope.user)
-        .then(function(response){
-        // set token (https://github.com/sahat/satellizer#authsettokentoken)
-          $auth.setToken(response.data.token);
-        // call $scope.isAuthenticated to set $scope.currentUser
-          $scope.isAuthenticated();
-        // clear sign up form
-          $scope.user = {};
-        // redirect to '/profile'
-          $location.path('/profile');
-        }, function(err){
-          console.log(err);
-        }
-        );
+   $scope.login = function() {
+    // login (https://github.com/sahat/satellizer#authloginuser-options)
+    $auth.login($scope.user)
+      .then(function(response){
+      // set token (https://github.com/sahat/satellizer#authsettokentoken)
+        $auth.setToken(response.data.token);
+      // call $scope.isAuthenticated to set $scope.currentUser
+        $scope.isAuthenticated();
+      // clear sign up form
+        $scope.user = {};
+      // redirect to '/profile'
+        $location.path('/profile');
+      }, function(err){
+        console.log(err);
+      });
     };
 }]);
 
@@ -145,8 +156,8 @@ app.controller('ProfileCtrl', ['$scope', '$auth', '$location', 'Task', function 
   };
 }]);
 
-//user show controller
-app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams', 'Task', function ($scope, $auth, $location, $routeParams,Task) {
+//task show controller
+app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams', 'Task', 'Subtask', function ($scope, $auth, $location, $routeParams, Task, Subtask) {
   taskId = $routeParams.id;
   console.log(taskId);
   $scope.singleTask = Task.get({id: taskId});
@@ -163,8 +174,53 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
   //update a task
   $scope.updateTask = function(){
     Task.update({id:taskId}, $scope.editTask, function(data){
-      console.log(data);
+      $scope.singleTask.name = data.name;
+      $scope.editTask = {};
     });
+  };
+
+  //add subtask to a task
+  $scope.addSubTask = function(){
+    Subtask.save({taskId: taskId}, $scope.subTask, function(data){
+      $scope.subTask = {};
+      $scope.singleTask.subtasks.push(data.subtasks[data.subtasks.length-1]);
+      console.log(data);
+      }, function(err){
+        console.log(err);
+    });
+  };
+
+  //delete subtask
+  $scope.deleteSubTask = function(subtask){
+    Subtask.delete({taskId: taskId, id: subtask._id}, function(data){
+      console.log(data);
+      $scope.singleTask=data;
+    });
+  };
+
+  //update subtask
+  $scope.editSubTask = function(subtask){
+    indexSubtask = $scope.singleTask.subtasks.indexOf(subtask);
+    Subtask.update({taskId: taskId, id: subtask._id}, subtask.subTaskEdit, function(data){
+      subtask.subTaskEdit = {};
+      console.log(data);
+      $scope.singleTask.subtasks[indexSubtask].name = data.name;
+    });
+  };
+
+  //mark subtask as completed 
+  $scope.completeSubTask = function(subtask){
+    indexSubtask = $scope.singleTask.subtasks.indexOf(subtask);
+    subtask.completed = true;
+    Subtask.update({taskId: taskId, id: subtask._id}, subtask, function(data){ 
+      $scope.singleTask.subtasks[indexSubtask].completed = subtask.completed;
+    });
+  };
+
+  //find a user (share function)
+  $scope.search = function(){
+    userId = $scope.searchUser;
+    console.log(userId);
   };
 
 }]);
