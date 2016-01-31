@@ -158,6 +158,8 @@ app.controller('ProfileCtrl', ['$scope', '$auth', '$location', 'Task', function 
     Task.save($scope.task, function(data){
       $scope.task={};
       $scope.tasks.push(data);
+      console.log(data);
+      $location.path('/tasks/' + data._id);
     }, function(err){
       console.log(err);
     }); 
@@ -209,6 +211,7 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
     Subtask.update({taskId: taskId, id: subtask._id}, subtask.subTaskEdit, function(data){
       subtask.subTaskEdit = {};
       $scope.singleTask.subtasks[indexSubtask].name = data.name;
+      subtask[$scope.showForm] = false;
     });
   };
 
@@ -228,9 +231,19 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
 
   //find a user (share function)
   $scope.search = function(){
+    $scope.results = false;
+    $scope.noResults = false;
     userEmail = $scope.searchUser;
     $http.get('api/users/email/' + userEmail).then(function(response){
-      $scope.foundUser = response.data;
+      console.log(response);
+      if(!response.data){
+        $scope.foundUser = "user not found";
+        $scope.noResults = true;
+      }
+      else{
+        $scope.foundUser = response.data;
+        $scope.results = true; 
+      }
     }, function(err){
       console.log(err);
     });
@@ -242,6 +255,23 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
     $http.put('api/users/' + user._id +'/task/' + taskId).then(function(data){
       console.log("data: " + data);
     });
+  };
+
+  $scope.editSubtaskForm = function(subtask){
+    if(subtask[$scope.showForm] === false){
+      subtask[$scope.showForm] = true;
+    }
+    else{
+      subtask[$scope.showForm] = false;
+    }
+  };
+  $scope.editTaskForm = function(){
+    if($scope.showEditTaskForm === false){
+      $scope.showEditTaskForm = true;
+    }
+    else{
+      $scope.showEditTaskForm = false;
+    }
   };
 }]);
 
