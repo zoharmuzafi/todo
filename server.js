@@ -3,7 +3,9 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     hbs = require('hbs'),
     mongoose = require('mongoose'),
-    auth = require('./resources/auth');
+    auth = require('./resources/auth'),
+    http = require('http').Server(app),
+    io = require('socket.io')(http);
 
 // require and load dotenv
 require('dotenv').load();
@@ -26,7 +28,7 @@ var User = require('./models/user');
 var Task = require('./models/task');
 var Subtask = require('./models/subtask');
 
-app.listen(3000, function() {
+http.listen(3000, function() {
   console.log('server started');
 });
 
@@ -215,6 +217,7 @@ app.post('/api/tasks/:taskId/subtasks', function(req, res){
     foundTask.subtasks.push(subtask);
     foundTask.save(function(err, savedTask){
       res.json(savedTask);
+      io.emit('addSubTask', req.body);
     });
   });
 });

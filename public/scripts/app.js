@@ -75,6 +75,31 @@ app.factory('User', ['$resource', function($resource) {
   });
 }]);
 
+//websocket
+app.factory('socket', function ($rootScope) {
+  var socket = io.connect();
+  return {
+    on: function (eventName, callback) {
+      socket.on(eventName, function () {  
+        var args = arguments;
+        $rootScope.$apply(function () {
+          callback.apply(socket, args);
+        });
+      });
+    },
+    emit: function (eventName, data, callback) {
+      socket.emit(eventName, data, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      });
+    }
+  };
+});
+
 //controllers
 
 
@@ -149,10 +174,18 @@ app.controller('HomeCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
 }]);
 
 //profile controller
-app.controller('ProfileCtrl', ['$scope', '$auth', '$location', 'Task', function ($scope, $auth, $location, Task) {
+app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task', function ($scope, socket, $auth, $location, Task) {
   
   //get all the tasks for a user
   $scope.tasks = Task.query();
+
+  io.on('connection', function (socket){
+    for(var i=0; i<$scope.tasks.length; i++){
+      socket.join(scope.tasks[i]);
+      console.log("joined: " + scope.tasks[i]);
+      } 
+  });
+  
   //add new task
   $scope.newTask = function(){
     Task.save($scope.task, function(data){
@@ -167,7 +200,7 @@ app.controller('ProfileCtrl', ['$scope', '$auth', '$location', 'Task', function 
 }]);
 
 //task show controller
-app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams', 'Task', 'Subtask', '$http', function ($scope, $auth, $location, $routeParams, Task, Subtask, $http) {
+app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$routeParams', 'Task', 'Subtask', '$http', function ($scope, socket, $auth, $location, $routeParams, Task, Subtask, $http) {
   taskId = $routeParams.id;
   $scope.singleTask = Task.get({id: taskId});
 
@@ -192,8 +225,7 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
   $scope.addSubTask = function(){
     Subtask.save({taskId: taskId}, $scope.subTask, function(data){
       $scope.subTask = {};
-      $scope.singleTask.subtasks.push(data.subtasks[data.subtasks.length-1]);
-      }, function(err){
+         }, function(err){
         console.log(err);
     });
   };
@@ -273,6 +305,11 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
       $scope.showEditTaskForm = false;
     }
   };
+
+  socket.on('addSubTask', function(subtask){
+    console.log(subtask);
+    $scope.singleTask.subtasks.push(subtask);
+  });
 }]);
 
 //edit profile controller
