@@ -6,7 +6,10 @@
   <input type="submit" value="Create" class="btn btn-block btn-info">
 </form>
 <hr>
-
+<p>{{currentUser._id}}</p>
+<p>{{currentUser.displayName}}</p>
+<p>{{currentUser.email}}</p>
+<p>{{currentUser.password}}</p>
 <div ng-repeat="Singletask in tasks">
 	<p>{{Singletask}}</p>
 	<p>{{Singletask.name}}</p>

@@ -63,6 +63,18 @@ app.factory('Subtask', ['$resource', function($resource) {
   });
 }]);
 
+//resource for user api calls
+app.factory('User', ['$resource', function($resource) {
+  return $resource("/api/users/:id", {id: "@_id"}, {
+    query: {
+      isArray: true
+    },
+    update: {
+      method: "PUT"
+    }
+  });
+}]);
+
 //controllers
 
 
@@ -72,7 +84,6 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
   $scope.isAuthenticated = function() {
     // send GET request to the api
     $http.get('/api/me').then(function(response){
-      console.log(response);
       $scope.currentUser = response.data;
     }, function(err){
       console.log(err);
@@ -100,7 +111,6 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
   $scope.signup = function() {
     $auth.signup($scope.user)
     .then(function(response) {
-      console.log(response.data.token);
       // set token 
       $auth.setToken(response.data.token);
       // excute isAuthenticated to set currentUser to the scope
@@ -142,9 +152,7 @@ app.controller('HomeCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
 app.controller('ProfileCtrl', ['$scope', '$auth', '$location', 'Task', function ($scope, $auth, $location, Task) {
   
   //get all the tasks for a user
-  $scope.tasks = Task.query(function(data) {
-    console.log(data);
-  });
+  $scope.tasks = Task.query();
   //add new task
   $scope.newTask = function(){
     Task.save($scope.task, function(data){
@@ -157,16 +165,13 @@ app.controller('ProfileCtrl', ['$scope', '$auth', '$location', 'Task', function 
 }]);
 
 //task show controller
-app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams', 'Task', 'Subtask', function ($scope, $auth, $location, $routeParams, Task, Subtask) {
+app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams', 'Task', 'Subtask', '$http', function ($scope, $auth, $location, $routeParams, Task, Subtask, $http) {
   taskId = $routeParams.id;
-  console.log(taskId);
   $scope.singleTask = Task.get({id: taskId});
-  console.log($scope.singleTask);
 
   //delete task 
   $scope.deleteTask = function(){
     Task.delete({id:taskId}, function(data){
-      console.log(data);
       $location.path('/profile');
     }); 
   };
@@ -179,12 +184,13 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
     });
   };
 
+
+
   //add subtask to a task
   $scope.addSubTask = function(){
     Subtask.save({taskId: taskId}, $scope.subTask, function(data){
       $scope.subTask = {};
       $scope.singleTask.subtasks.push(data.subtasks[data.subtasks.length-1]);
-      console.log(data);
       }, function(err){
         console.log(err);
     });
@@ -193,7 +199,6 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
   //delete subtask
   $scope.deleteSubTask = function(subtask){
     Subtask.delete({taskId: taskId, id: subtask._id}, function(data){
-      console.log(data);
       $scope.singleTask=data;
     });
   };
@@ -203,7 +208,6 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
     indexSubtask = $scope.singleTask.subtasks.indexOf(subtask);
     Subtask.update({taskId: taskId, id: subtask._id}, subtask.subTaskEdit, function(data){
       subtask.subTaskEdit = {};
-      console.log(data);
       $scope.singleTask.subtasks[indexSubtask].name = data.name;
     });
   };
@@ -211,7 +215,12 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
   //mark subtask as completed 
   $scope.completeSubTask = function(subtask){
     indexSubtask = $scope.singleTask.subtasks.indexOf(subtask);
-    subtask.completed = true;
+    if(subtask.completed === true){
+      subtask.completed = false;
+    }
+    else{
+      subtask.completed = true;
+    } 
     Subtask.update({taskId: taskId, id: subtask._id}, subtask, function(data){ 
       $scope.singleTask.subtasks[indexSubtask].completed = subtask.completed;
     });
@@ -219,14 +228,47 @@ app.controller('TasksShowCtrl', ['$scope', '$auth', '$location', '$routeParams',
 
   //find a user (share function)
   $scope.search = function(){
-    userId = $scope.searchUser;
-    console.log(userId);
+    userEmail = $scope.searchUser;
+    $http.get('api/users/email/' + userEmail).then(function(response){
+      $scope.foundUser = response.data;
+    }, function(err){
+      console.log(err);
+    });
   };
 
+  //share task with a user
+  $scope.share = function(user){
+    console.log(user._id);
+    $http.put('api/users/' + user._id +'/task/' + taskId).then(function(data){
+      console.log("data: " + data);
+    });
+  };
 }]);
 
 //edit profile controller
-app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', function ($scope, $auth, $location, Task) {
+app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User', function ($scope, $auth, $location, Task, User) {
+
+  //update user
+  $scope.updateUser = function(){
+    User.update({id:$scope.currentUser._id}, $scope.edituser, function(data){
+      console.log(data);
+      $scope.currentUser.displayName = data.displayName;
+      $scope.currentUser.email = data.email;
+      $location.path('/profile');
+    });  
+  };
+
+  //delete user
+  $scope.deletUser = function(){
+    User.delete({id:$scope.currentUser._id}, function(data){
+      console.log(data);
+      $scope.isAuthenticated();
+      $location.path('/');
+    });
+  };
+  
+  
+
 }]);
 
 

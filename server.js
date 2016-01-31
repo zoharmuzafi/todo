@@ -88,6 +88,54 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
     });
   });
 });
+/* 
+
+
+    user CRUD routs 
+
+*/
+
+//get a user with a given email 
+app.get('/api/users/email/:id', function(req, res){
+  userEmail = req.params.id;
+  User.findOne({email: userEmail}, function(err, foundUser){
+    res.json(foundUser);
+  });
+});
+
+//share task with a user
+app.put('/api/users/:id/task/:taskId', function(req, res){
+  User.findById(req.params.id, function(err, foundUser){
+    Task.findById(req.params.taskId, function(err, foundTask){
+      foundUser.tasks.push(foundTask);
+      foundUser.save(function(err, savedUser){
+        console.log(savedUser);
+        res.json(savedUser);
+      });
+    });
+  });
+});
+
+//upadte a user
+app.put('/api/users/:id', function(req, res){
+  userId = req.params.id;
+  User.findById(userId, function(err, foundUser){
+    foundUser.email = req.body.email || foundUser.email;
+    foundUser.displayName = req.body.displayName || foundUser.displayName;
+    foundUser.save(function(err, savedUpdatedUser){
+      res.json(savedUpdatedUser);
+    });
+  });
+});
+
+
+//delete a user
+app.delete('/api/users/:id', function(req, res){
+  userId = req.params.id;
+  User.remove({_id: userId}, function(err, deletedUser){
+    res.json(deletedUser);
+  });
+});
 
 /* 
 
@@ -103,7 +151,6 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
 //get all tasks of a user
 app.get('/api/tasks', auth.ensureAuthenticated, function(req,res){
   User.findById(req.user).populate("tasks").exec(function(err, user){
-    console.log("sending" + user);
     res.json(user.tasks);
   });
 });
@@ -114,10 +161,8 @@ app.post('/api/tasks', auth.ensureAuthenticated, function(req, res){
       var task =  new Task({
       name: req.body.name
       });
-      task.save(function(err, savedTask){
-        console.log("saving " + savedTask);
+      task.save(function(err, savedTask){ 
         user.tasks.push(savedTask);
-        console.log(user.tasks);
         user.save();
         res.json(savedTask);
       });
@@ -128,7 +173,6 @@ app.post('/api/tasks', auth.ensureAuthenticated, function(req, res){
 app.get('/api/tasks/:id', function(req,res){
   taskId = req.params.id;
   Task.findOne({_id:taskId}, function(err, task){
-    console.log(task);
     res.json(task);
   });
 });
@@ -137,7 +181,6 @@ app.get('/api/tasks/:id', function(req,res){
 app.delete('/api/tasks/:id', function(req, res){
   taskId = req.params.id;
   Task.remove({_id:taskId}, function(err, deletedTask){
-    console.log(deletedTask);
     res.json(deletedTask);
   });
 });
@@ -148,11 +191,12 @@ app.put('/api/tasks/:id', function(req, res){
   Task.findById(taskId, function(err, foundTask){
     foundTask.name = req.body.name || foundTask.name;
     foundTask.save(function(err, savedUpdatedTask){
-      console.log(savedUpdatedTask);
       res.json(savedUpdatedTask);
     });
   });
 });
+
+
 
 /* 
 
@@ -170,7 +214,6 @@ app.post('/api/tasks/:taskId/subtasks', function(req, res){
     });
     foundTask.subtasks.push(subtask);
     foundTask.save(function(err, savedTask){
-      console.log("saving: " + savedTask);
       res.json(savedTask);
     });
   });
@@ -182,10 +225,8 @@ app.delete('/api/tasks/:taskId/subtasks/:id', function(req, res){
   subtaskId = req.params.id;
   Task.findById(taskId, function(err, foundTask){
     var foundSubTask = foundTask.subtasks.id(subtaskId); 
-    console.log("found Subtask: " + foundSubTask);
     foundSubTask.remove();
     foundTask.save(function(err, savedTask){
-      console.log("deleted: " + savedTask);
        res.json(savedTask);
     });
   });
@@ -196,14 +237,17 @@ app.put('/api/tasks/:taskId/subtasks/:id', function(req, res){
   taskId = req.params.taskId;
   subtaskId = req.params.id;
   Task.findById(taskId, function(err, foundTask){
-    console.log(foundTask);
     var foundSubTask = foundTask.subtasks.id(subtaskId); 
     foundSubTask.name = req.body.name || foundSubTask.name;
-    foundSubTask.completed = req.body.completed || foundSubTask.completed;
+    //must be done with if and else since this 2 valuse should be alternate when clicking the button
+    if(req.body.completed === true){
+      foundSubTask.completed = true;
+    }else{
+      foundSubTask.completed = false;
+    }
     foundTask.save(function(err, savedTask){
        console.log(err);
        res.json(foundSubTask);
-
     });
   });
 });
