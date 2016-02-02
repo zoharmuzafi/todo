@@ -90,6 +90,7 @@ app.put('/api/me', auth.ensureAuthenticated, function (req, res) {
     });
   });
 });
+
 /* 
 
 
@@ -108,11 +109,13 @@ app.get('/api/users/email/:id', function(req, res){
 //share task with a user
 app.put('/api/users/:id/task/:taskId', function(req, res){
   User.findById(req.params.id, function(err, foundUser){
-    Task.findById(req.params.taskId, function(err, foundTask){
+    Task.findById(req.params.taskId).populate("users").exec(function(err, foundTask){
+      foundTask.users.push(foundUser);
+      foundTask.save();
       foundUser.tasks.push(foundTask);
       foundUser.save(function(err, savedUser){
-        console.log(savedUser);
-        res.json(savedUser);
+        io.emit('addTask', foundTask);
+        res.json(savedUser);  
       });
     });
   });
@@ -163,10 +166,12 @@ app.post('/api/tasks', auth.ensureAuthenticated, function(req, res){
       var task =  new Task({
       name: req.body.name
       });
+      task.users.push(user);
       task.save(function(err, savedTask){ 
         user.tasks.push(savedTask);
         user.save();
         res.json(savedTask);
+        io.emit('addTask', savedTask);
       });
   });
 });
@@ -174,7 +179,7 @@ app.post('/api/tasks', auth.ensureAuthenticated, function(req, res){
 //get one task
 app.get('/api/tasks/:id', function(req,res){
   taskId = req.params.id;
-  Task.findOne({_id:taskId}, function(err, task){
+  Task.findOne({_id:taskId}).populate("users").exec(function(err, task){
     res.json(task);
   });
 });
@@ -182,17 +187,23 @@ app.get('/api/tasks/:id', function(req,res){
 //delete a task
 app.delete('/api/tasks/:id', function(req, res){
   taskId = req.params.id;
-  Task.remove({_id:taskId}, function(err, deletedTask){
-    res.json(deletedTask);
+  Task.findById(taskId, function(err, foundTask){
+    console.log(err, foundTask);
+    io.emit('deletedTask', foundTask);
+    Task.remove({_id:taskId}, function(err, deletedTask){
+      res.json(deletedTask); 
+    });
+
   });
 });
 
-//update a task name. didn't user update because it updating the db and returns the old version of the object
+//update a task . didn't use update because it updating the db and returns the old version of the object
 app.put('/api/tasks/:id', function(req, res){
   taskId = req.params.id;
   Task.findById(taskId, function(err, foundTask){
     foundTask.name = req.body.name || foundTask.name;
     foundTask.save(function(err, savedUpdatedTask){
+      io.emit('editedTask', savedUpdatedTask);
       res.json(savedUpdatedTask);
     });
   });
@@ -217,7 +228,7 @@ app.post('/api/tasks/:taskId/subtasks', function(req, res){
     foundTask.subtasks.push(subtask);
     foundTask.save(function(err, savedTask){
       res.json(savedTask);
-      io.emit('addSubTask', req.body);
+      io.emit('addSubTask', savedTask);
     });
   });
 });
@@ -228,7 +239,9 @@ app.delete('/api/tasks/:taskId/subtasks/:id', function(req, res){
   subtaskId = req.params.id;
   Task.findById(taskId, function(err, foundTask){
     var foundSubTask = foundTask.subtasks.id(subtaskId); 
-    foundSubTask.remove();
+    foundSubTask.remove(function(err, deletedSubTask){
+      io.emit('deletedSubTask', deletedSubTask);
+    });
     foundTask.save(function(err, savedTask){
        res.json(savedTask);
     });
@@ -248,8 +261,10 @@ app.put('/api/tasks/:taskId/subtasks/:id', function(req, res){
     }else{
       foundSubTask.completed = false;
     }
+      
     foundTask.save(function(err, savedTask){
        console.log(err);
+       io.emit('editSubTask', savedTask);
        res.json(foundSubTask);
     });
   });

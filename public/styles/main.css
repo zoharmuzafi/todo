@@ -1,0 +1,21 @@
+#welcomeHeader{
+	background-size: cover;
+	width: 100%;
+	height: 500px;
+}
+.welcomeHeader{
+	padding: 0px;
+}
+.navbar{
+	margin-bottom: 0px;
+}
+.howItWorksRow{
+	width: 100%;
+	padding: 10%;
+	/*background-color: gray;*/
+}
+.howItWorksImage{
+	width: 50%;
+	height: 50%;
+	border-radius: 50%;
+}

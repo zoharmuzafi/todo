@@ -1,6 +1,7 @@
 <div class="row">
 	<div class="col-md-6 col-md-offset-3 text-center">
 		<h3>Task: {{singleTask.name}} &nbsp &nbsp <a ng-click="deleteTask()" href="#">delete task</a> &nbsp &nbsp <a ng-click="editTaskForm()" href="#">edit task</a>
+		<small ng-repeat = "user in users">{{user.desplayName}}</small>
 			<form ng-submit="updateTask()" ng-show="showEditTaskForm">
 				<div class="form-group">
 			    <input type="text" ng-model="editTask.name" class="form-control">
@@ -28,7 +29,7 @@
 		<p>{{foundUser.displayName}}</p>
 	</div>
 	<div class="col-md-2">
-		<a ng-click="share(foundUser)">Share Task</a>
+		<a ng-click="share(foundUser)" href="#">Share Task</a>
 	</div>
 </div>
 <div class="row" ng-show="noResults">
