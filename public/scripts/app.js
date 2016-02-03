@@ -137,6 +137,11 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
       console.log(err);
     }); 
   };
+
+  //adding content to the form
+  $scope.editUserForm = function(){
+    $scope.edituser = $scope.currentUser;
+  };
 }]);
 
 //auth controller for login and signup

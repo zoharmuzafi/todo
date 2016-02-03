@@ -72,6 +72,15 @@ ul{
 	padding: 10%;
 	background-color: white;
 }
+a{
+	color: black;
+}
+.visabiltyHidden{
+	visibility: hidden;;
+}
+.foundUserDiv{
+	margin-top: 1%;
+}
 @media(max-width: 800px){
 	.welcomeHeaderTitle {
     font-size: 25px;
@@ -79,6 +88,9 @@ ul{
 	}
 	.getStartedTitle{
 		margin: 2% 19%;
+	}
+	h2{
+		font-size: 20px;
 	}
 }
 
