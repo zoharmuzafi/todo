@@ -21,14 +21,17 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'hbs');
 
 // connect to mongodb
-mongoose.connect('mongodb://localhost/todo');
+mongoose.connect(
+  process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://localhost/todo');
 
 // require User model
 var User = require('./models/user');
 var Task = require('./models/task');
 var Subtask = require('./models/subtask');
 
-http.listen(3000, function() {
+http.listen(process.env.PORT ||3000, function() {
   console.log('server started');
 });
 
