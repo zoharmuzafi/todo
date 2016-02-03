@@ -105,7 +105,8 @@ app.factory('socket', function ($rootScope) {
 
 //main controller for all the app
 app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', function ($scope, $auth, $location, $http, Task) {
-  //add the current user to the scope after login/signup
+
+  // add the current user to the scope after login/signup
   $scope.isAuthenticated = function() {
     // send GET request to the api
     $http.get('/api/me').then(function(response){
@@ -115,7 +116,9 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
       $auth.removeToken();
     });
   };
+
   $scope.isAuthenticated();
+
   //logou- remove the token and the current user from the scope
   $scope.logout = function(){
     $auth.removeToken();
@@ -123,14 +126,21 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
     $location.path('/login');
   };
 
+  //add new task
+  $scope.newTask = function(){
+    Task.save($scope.task, function(data){
+      $scope.task={};
+      $scope.tasks.push(data);
+      console.log(data);
+      $location.path('/tasks/' + data._id);
+    }, function(err){
+      console.log(err);
+    }); 
+  };
 }]);
 
 //auth controller for login and signup
 app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($scope, $auth, $location, Task) {
-  if ($scope.currentUser) {
-      $location.path('/profile');
-      $scope.user = {};
-    }
 
   //signup
   $scope.signup = function() {
@@ -170,12 +180,18 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
 
 //home controller for homepage (include login and sign up)
 app.controller('HomeCtrl', ['$scope', '$auth', '$location', 'Task', function ($scope, $auth, $location, Task) {
-  
+  if ($scope.currentUser) {
+    $location.path('/profile');
+    $scope.user = {};
+  }  
 }]);
 
 //profile controller
-app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task', function ($scope, socket, $auth, $location, Task) {
-  
+app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task', '$http', function ($scope, socket, $auth, $location, Task, $http) {
+  if(($scope.currentUser===undefined) || ($scope.currentUser===null)){
+    $location.path('/');
+  }
+
   //get all the tasks for a user
   $scope.tasks = Task.query();
   
@@ -222,6 +238,7 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
 app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$routeParams', 'Task', 'Subtask', '$http', function ($scope, socket, $auth, $location, $routeParams, Task, Subtask, $http) {
   taskId = $routeParams.id;
   $scope.singleTask = Task.get({id: taskId});
+  console.log($scope.singleTask);
 
   //delete task 
   $scope.deleteTask = function(){
@@ -235,6 +252,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
     Task.update({id:taskId}, $scope.editTask, function(data){
       $scope.singleTask.name = data.name;
       $scope.editTask = {};
+      $scope.showEditTaskForm = false;
     });
   };
 
@@ -252,7 +270,6 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
   //delete subtask
   $scope.deleteSubTask = function(subtask){
     Subtask.delete({taskId: taskId, id: subtask._id}, function(data){
-      // $scope.singleTask=data;
       console.log(data);
     });
   };
@@ -310,6 +327,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
   };
 
   $scope.editSubtaskForm = function(subtask){
+    subtask.subTaskEdit = subtask;
     if(subtask[$scope.showForm] === false){
       subtask[$scope.showForm] = true;
     }
@@ -318,13 +336,23 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
     }
   };
   $scope.editTaskForm = function(){
-    if($scope.showEditTaskForm === false){
+    if(!$scope.showEditTaskForm){
       $scope.showEditTaskForm = true;
+      $scope.editTask = $scope.singleTask;
     }
     else{
       $scope.showEditTaskForm = false;
     }
   };
+  $scope.shareTaskForm = function(){
+    if(!$scope.shareFormShow){
+      $scope.shareFormShow = true;
+    }
+    else{
+      $scope.shareFormShow = false;
+    }
+  };
+  
 
   //emit the client if added a new subtask
   socket.on('addSubTask', function(task){
@@ -335,8 +363,13 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
 
   //emit the client if subtask deleted
   socket.on('deletedSubTask', function(deleteSubTask){
-    var indexOfDeletedSubTask = $scope.singleTask.subtasks.indexOf(deleteSubTask);
-    console.log(indexOfDeletedSubTask);
+    console.log("scope" + $scope.singleTask.subtasks);
+    console.log("deleted" + deleteSubTask);
+    var foundSubTask = $scope.singleTask.subtasks.filter(function(subtask){
+      return subtask._id === deleteSubTask._id;
+    })[0];
+    var indexOfDeletedSubTask= $scope.singleTask.subtasks.indexOf(foundSubTask);
+    console.log("index"+ indexOfDeletedSubTask);
     $scope.singleTask.subtasks.splice(indexOfDeletedSubTask,1);
   });
 
@@ -387,8 +420,6 @@ app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User',
     });
   };
   
-  
-
 }]);
 
 

@@ -240,7 +240,8 @@ app.delete('/api/tasks/:taskId/subtasks/:id', function(req, res){
   Task.findById(taskId, function(err, foundTask){
     var foundSubTask = foundTask.subtasks.id(subtaskId); 
     foundSubTask.remove(function(err, deletedSubTask){
-      io.emit('deletedSubTask', deletedSubTask);
+      console.log(foundSubTask);
+      io.emit('deletedSubTask', foundSubTask);
     });
     foundTask.save(function(err, savedTask){
        res.json(savedTask);
