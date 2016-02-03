@@ -55,8 +55,9 @@ app.post('/auth/signup', function (req, res) {
     user.save(function (err, result) {
       if (err) {
         res.status(500).send({ message: err.message });
+      } else {
+        res.send({ token: auth.createJWT(result) });
       }
-      res.send({ token: auth.createJWT(result) });
     });
   });
 });
@@ -118,6 +119,7 @@ app.put('/api/users/:id/task/:taskId', function(req, res){
       foundUser.tasks.push(foundTask);
       foundUser.save(function(err, savedUser){
         io.emit('addTask', foundTask);
+        io.emit('editedTask', foundTask);
         res.json(savedUser);  
       });
     });

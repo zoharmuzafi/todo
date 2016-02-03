@@ -2,16 +2,18 @@
 	<div class="col-md-4 col-md-offset-4 text-center">
 		<div class="borderForm">
 			<h3>Log In</h3><br>
-			<form ng-submit="login()">
+			<form ng-submit="login()" name="loginForm">
 				<div class="form-group">
-				  <input type="text" ng-model="user.email" class="form-control" placeholder="Email">
+				  <input type="email" ng-model="user.email" class="form-control" name="email" placeholder="Email" ng-pattern="/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/">
+				  <span ng-show="loginForm.email.$touched && loginForm.email.$error.pattern">Please make sure you entered valid email</span>
 				</div>
 				<div class="form-group">
-				  <input type="password" ng-model="user.password" class="form-control" placeholder="Password">
+				  <input type="password" ng-model="user.password" class="form-control" name="password" placeholder="Password" minlength="6" maxlength="10" required>
+				  <span ng-show="loginForm.password.$touched && (loginForm.password.$error.minlength || signupForm.password.$error.maxlength || signupForm.password.$error.required)">Password should be 6-10 charcters</span>
 				</div>
 				  <input type="submit" value="Log In" class="btn btn-block btn-info"><br>
 			</form>
-				<p class="text-muted">Don't have an account? <a href="/signup">Sign up here</a></p>
+				<p class="text-muted">Don't have an account? <a class="loginLink" href="/signup">Sign up here</a></p>
 		</div>
 	</div>
 </div>

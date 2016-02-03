@@ -27,7 +27,7 @@ body{
 	font-size: 60px;
 }
 .howItWorksImage{
-	font-size: 100px;
+	font-size: 100px !important;
 }
 .getStartedTitle{
 	font-family: 'Droid Sans', sans-serif;
@@ -80,6 +80,16 @@ a{
 }
 .foundUserDiv{
 	margin-top: 1%;
+}
+.loginLink{
+	color: #46b8da;
+}
+.borderBox{
+	border: 1px solid #ddd;
+	border-radius: 0;
+	background-color: white;
+	padding: 0% 4% 5% 4%;
+	margin-top: 5%
 }
 @media(max-width: 800px){
 	.welcomeHeaderTitle {

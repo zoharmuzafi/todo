@@ -1,16 +1,18 @@
 <div class="row" id="profileTitle">
 	<div class="col-md-6 col-md-offset-3 text-center">
-		<form ng-submit="newTask()" class="form-inline">
+		<form ng-submit="newTask()" class="form-inline" name="taskForm">
 		  <div class="form-group">
-		    <input type="text" ng-model="task.name" class="form-control" placeholder="Create a new task">
+		    <input type="text" ng-model="task.name" class="form-control" placeholder="Create a new task" name="task" minlength="2" maxlength="15" required>
 		  </div>
-		  <input type="submit" value="Create" class="btn btn-info">
+		  <input type="submit" value="Create" class="btn btn-info"><br>
+		  <span ng-show="taskForm.task.$touched && (taskForm.task.$error.minlength || taskForm.task.$error.maxlength || taskForm.task.$error.required)">Task should be 2-15 charcters</span>
 		</form>
 	</div>
 </div><br><br>
 <div class="row">
 	<div class="col-md-6 col-md-offset-3 text-center">
-		<h3>This is what you have to do....</h3><br>
+		<h3 ng-show="tasks.length">This is what you have to do....</h3><br>
+		<h3 ng-hide="tasks.length">You still don't have anything to do....</h3><br>
 	</div>
 </div>
 <div class="row">

@@ -1,4 +1,4 @@
-var app = angular.module('todoApp', ['ngRoute', 'ngResource', 'satellizer']);
+var app = angular.module('todoApp', ['ngRoute', 'ngResource', 'satellizer', 'toastr']);
 
 //routes
 app.config(['$routeProvider', '$locationProvider',
@@ -145,10 +145,11 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
 }]);
 
 //auth controller for login and signup
-app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($scope, $auth, $location, Task) {
+app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', 'toastr', function ($scope, $auth, $location, Task, toastr) {
 
   //signup
   $scope.signup = function() {
+
     $auth.signup($scope.user)
     .then(function(response) {
       // set token 
@@ -160,6 +161,7 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
       // redirect to '/profile'
       $location.path('/profile');
       }, function(err) {
+        toastr.error('Email or Password is incorrect', 'Error');
         console.log(err);
     });
   };
@@ -177,7 +179,10 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', function ($s
         $scope.user = {};
       // redirect to '/profile'
         $location.path('/profile');
+
       }, function(err){
+        console.log(err);
+        toastr.error('Please check that you insert all the dinformation correctly', 'Error');
         console.log(err);
       });
     };
@@ -328,6 +333,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
     console.log(user._id);
     $http.put('api/users/' + user._id +'/task/' + taskId).then(function(data){
       console.log("data: " + data);
+      $scope.shareFormShow = false;
     });
   };
 
@@ -343,7 +349,6 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
   $scope.editTaskForm = function(){
     if(!$scope.showEditTaskForm){
       $scope.showEditTaskForm = true;
-      $scope.editTask = $scope.singleTask;
     }
     else{
       $scope.showEditTaskForm = false;
@@ -404,8 +409,10 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
 }]);
 
 //edit profile controller
-app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User', function ($scope, $auth, $location, Task, User) {
-
+app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User', '$routeParams', 'toastr', function ($scope, $auth, $location, Task, User, $routeParams, toastr) {
+  if($routeParams.id !== $scope.currentUser._id){
+    $location.path('/profile');
+  }
   //update user
   $scope.updateUser = function(){
     User.update({id:$scope.currentUser._id}, $scope.edituser, function(data){
@@ -413,6 +420,10 @@ app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User',
       $scope.currentUser.displayName = data.displayName;
       $scope.currentUser.email = data.email;
       $location.path('/profile');
+      toastr.success('Your profile was updated', 'Updated!');
+    },
+    function(err){
+      toastr.error("profile didn't update", 'Error');
     });  
   };
 
@@ -420,7 +431,7 @@ app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User',
   $scope.deletUser = function(){
     User.delete({id:$scope.currentUser._id}, function(data){
       console.log(data);
-      $scope.isAuthenticated();
+      $scope.logout();
       $location.path('/');
     });
   };

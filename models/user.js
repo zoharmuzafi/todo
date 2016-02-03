@@ -7,9 +7,9 @@ var mongoose = require('mongoose'),
 var userSchema = new Schema({
   created: { type: Date },
   updated: { type: Date },
-  email: { type: String, unique: true, lowercase: true },
-  password: { type: String, select: false },
-  displayName: String,
+  email: { type: String, unique: true, lowercase: true, match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/]},
+  password: { type: String, select: false, minLength: 6, maxLength: 10 },
+  displayName: {type: String, minLength: 4, maxLength: 20},
   tasks: [{type: Schema.Types.ObjectId, ref: "Task"}]
 });
 

@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var SubtaskSchema = new Schema({
-	name:{type: String, required: true},
+	name:{type: String, required: true, minLength: 2, maxLength: 15},
 	completed: {type: Boolean, default: false}
 });
 
