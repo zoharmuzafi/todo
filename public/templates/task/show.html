@@ -1,68 +1,89 @@
-<div class="row">
+<div class="row titleTask">
 	<div class="col-md-6 col-md-offset-3 text-center">
-		<h3>Task: {{singleTask.name}} &nbsp &nbsp <a ng-click="deleteTask()" href="#">delete task</a> &nbsp &nbsp <a ng-click="editTaskForm()" href="#">edit task</a>
-			<form ng-submit="updateTask()" ng-show="showEditTaskForm">
+		<h2 ng-hide="showEditTaskForm || shareFormShow">{{singleTask.name}} &nbsp &nbsp <a ng-click="shareTaskForm()" href="#"><i class="fa fa-share"></i>
+		</a>&nbsp &nbsp <a ng-click="editTaskForm()" href="#"><i class="fa fa-pencil"></i></a>&nbsp &nbsp <a ng-click="deleteTask()" href="#"><i class="fa fa-trash"></i></a></h2>
+		<div ng-hide="showEditTaskForm || shareFormShow"><small>Shared with:</small><small ng-repeat ="user in singleTask.users" ng-if="$index<singleTask.users.length-1">{{user.displayName}}, </small><small>{{singleTask.users[singleTask.users.length-1].displayName}}</small></div>
+			<form class="form-inline" ng-submit="updateTask()" ng-show="showEditTaskForm">
 				<div class="form-group">
-			    <input type="text" ng-model="editTask.name" class="form-control">
+			    <input type="text" ng-model="editTask.name" class="form-control" ng-binding="{{singleTask.name}}">
 			  </div>
-			  <input type="submit" value="update" class="btn btn-block btn-info">
+			  <input type="submit" value="update" class="btn btn-info">
+			  <a ng-click="editTaskForm()" href="#" class="btn btn-info">X</a>
 			</form>
-		</h3>
+			<form ng-submit="search()" class="form-inline" ng-show="shareFormShow">
+				<div class="form-group">
+			    <input type="text" ng-model="searchUser" class="form-control" placeholder= "search a user (email)">
+				</div>
+			 	<input type="submit" value="search" class="btn btn-info">
+			 	<a ng-click="shareTaskForm()" href="#" class="btn btn-info">X</a>
+			</form>
 	</div>	
-</div>
-<div class="row">
-	<div class="col-md-4 col-md-offset-2 text-center">
-		<h4>wanna share this task with another user?</h4>
-	</div>	
-	<div class="col-md-3 text-center">
-		<form ng-submit="search()">
-			<div class="form-group">
-		    <input type="text" ng-model="searchUser" class="form-control" placeholder= "search for a user">
-			</div>
-		 	<input type="submit" value="search" class="btn btn-block btn-info">
-		</form>
-</div>
-</div>
+</div><br>
 <div class="row" ng-show="results">
-	<div class="col-md-4 col-md-offset-3 text-center">
-		<p>{{foundUser.displayName}}</p>
-	</div>
-	<div class="col-md-2">
-		<a ng-click="share(foundUser)">Share Task</a>
+	<div class="col-md-6 col-md-offset-3 text-center foundUserDiv">
+		<a ng-show="shareFormShow" ng-click="share(foundUser)" href="#">{{foundUser.displayName}} (select)</a>
 	</div>
 </div>
-<div class="row" ng-show="noResults">
-	<div class="col-md-4 col-md-offset-3 text-center">
-		<p>{{foundUser}}</p>
-	</div>
-</div><hr>
-<ul>
-	<div class="row">
-		<div class="col-md-6 col-md-offset-3">
-			<li ng-repeat = "subtask in singleTask.subtasks">
-				{{subtask.name}} &nbsp &nbsp
-				<a ng-click="deleteSubTask(subtask)" href="#">delete</a>&nbsp &nbsp
-				<a ng-click="editSubtaskForm(subtask)" href="#">edit</a>&nbsp &nbsp
-				<a ng-click="completeSubTask(subtask)" href="#">Mark As Done</a>
-				<form ng-submit="editSubTask(subtask)" ng-show="subtask[showForm]">
-					<div class="form-group">
-				    <input type="text" ng-model="subtask.subTaskEdit.name" class="form-control">
-				  </div>
-				  <input type="submit" value="update" class="btn btn-block btn-info">
-				</form>
-			</li>	
-
-		</div>
-	</div>
-</ul>
-<div class="row">
-	<div class="col-md-6 col-md-offset-3">
-		<form ng-submit="addSubTask()">
+<div class="row " ng-hide="showEditTaskForm || shareFormShow">
+	<div class="col-md-6 col-md-offset-3 text-center">
+		<p ng-show="noResults">{{foundUser}}</p>
+	</div><br><br>
+</div> 
+<div class="row" ng-hide="showEditTaskForm || shareFormShow">
+	<div class="col-md-6 col-md-offset-3 text-center">
+		<form ng-submit="addSubTask()" class="form-inline">
 			<div class="form-group">
 		    <input type="text" ng-model="subTask.name" class="form-control" placeholder="Add a new subtask">
 		  </div>
-  		<input type="submit" value="Add" class="btn btn-block btn-info">
+  		<input type="submit" value="Add" class="btn btn-info">
 		</form>
 	</div>
 </div>
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<ul>
+			<li ng-repeat = "subtask in singleTask.subtasks">
+				<div class="row">
+					<div class="col-md-1 col-md-offset-3 col-sm-1 col-sm-offset-1">
+						<i ng-hide="subtask.completed" ng-click="completeSubTask(subtask)" class="fa fa-square-o check"></i>
+						<i ng-show="subtask.completed" ng-click="completeSubTask(subtask)" class="fa fa-check-square-o check"></i>
+					</div>
+					<div class="col-md-5 col-sm-5">
+						<p ng-hide="subtask[showForm]">{{subtask.name}}</p>
+						<form ng-submit="editSubTask(subtask)" ng-show="subtask[showForm]" class="form-inline">
+							<div class="form-group">
+				    		<input type="text" ng-model="subtask.subTaskEdit.name" class="form-control">
+				  		</div>
+				  		<input type="submit" value="update" class="btn btn-info">
+						</form>
+					</div>
+					<div class="col-md-2 col-sm-2">
+						<a ng-click="deleteSubTask(subtask)" href="#"><i class="fa fa-trash"></i></a>&nbsp &nbsp
+						<a ng-click="editSubtaskForm(subtask)" href="#"><i class="fa fa-pencil"></i></a>&nbsp &nbsp
+					</div>
+				</div>
+			</li>	
+		</ul>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		
+	</div>
+</div>
+
+				
+				
+		
+
+		
+
+
+
+
+
+
+
 

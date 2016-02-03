@@ -1,26 +1,27 @@
-<div class="row">
+<div class="row" id="profileTitle">
 	<div class="col-md-6 col-md-offset-3 text-center">
-		<h1>Profile</h1>
-	</div>
-</div>
-<div class="row">
-	<div class="col-md-4 col-md-offset-4">
-		<form ng-submit="newTask()">
+		<form ng-submit="newTask()" class="form-inline">
 		  <div class="form-group">
-		    <input type="text" ng-model="task.name" class="form-control" placeholder="Name">
+		    <input type="text" ng-model="task.name" class="form-control" placeholder="Create a new task">
 		  </div>
-		  <input type="submit" value="Create" class="btn btn-block btn-info">
+		  <input type="submit" value="Create" class="btn btn-info">
 		</form>
 	</div>
-</div>
-<hr>
+</div><br><br>
 <div class="row">
 	<div class="col-md-6 col-md-offset-3 text-center">
-		<h3>Task</h3>
+		<h3>This is what you have to do....</h3><br>
 	</div>
 </div>
-<div class="row" ng-repeat="Singletask in tasks">
-	<div class="col-md-4 col-md-offset-3">	
-		<a ng-href="/tasks/{{Singletask._id}}">{{Singletask.name}}</a>
-	</div>
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<div class="list-group text-center" >
+			<div ng-repeat="singleTask in tasks">
+				<a ng-href="/tasks/{{singleTask._id}}" class="list-group-item" >{{singleTask.name}} &nbsp&nbsp({{singleTask.subtasks.length}} subtasks)</a>
+			</div>	
+		</div>
+	</div>	
 </div>
+
+
+
