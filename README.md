@@ -1,7 +1,7 @@
 Description:
 
 Real-time to do app.
-The app allows the user to create and manage thier tasks, add subtasks and share with other users. The app is updated in real time.
+The app allows the users to create and manage thier tasks, add subtasks and add users to collaborate together on a task. The app is updated in real time.
 
 Link to Heroku hosted project:
 
