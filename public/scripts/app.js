@@ -132,7 +132,6 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
     Task.save($scope.task, function(data){
       $scope.task={};
       $scope.tasks.push(data);
-      console.log(data);
       $location.path('/tasks/' + data._id);
     }, function(err){
       console.log(err);
@@ -181,7 +180,6 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', 'toastr', fu
       }, function(err){
         console.log(err);
         toastr.error('Email or password is incorrect.', 'Error');
-        console.log(err);
       });
     };
 }]);
@@ -208,7 +206,6 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
     Task.save($scope.task, function(data){
       $scope.task={};
       $scope.tasks.push(data);
-      console.log(data);
       $location.path('/tasks/' + data._id);
     }, function(err){
       console.log(err);
@@ -216,7 +213,6 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
   };
 
    socket.on('addTask', function(task){
-    console.log("added");
     for(var i=0; i<task.users.length; i++){
       if (task.users[i]._id === $scope.currentUser._id){
         $scope.tasks.push(task);
@@ -226,7 +222,6 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
 
    socket.on('deletedTask', function(deletedTask){
     var indexOfDeletedTask = $scope.tasks.indexOf(deletedTask);
-    console.log(indexOfDeletedTask);
     $scope.tasks.splice(indexOfDeletedTask,1);
   });
 
@@ -246,7 +241,6 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
 app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$routeParams', 'Task', 'Subtask', '$http', function ($scope, socket, $auth, $location, $routeParams, Task, Subtask, $http) {
   taskId = $routeParams.id;
   $scope.singleTask = Task.get({id: taskId});
-  console.log($scope.singleTask);
 
   //delete task 
   $scope.deleteTask = function(){
@@ -278,7 +272,6 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
   //delete subtask
   $scope.deleteSubTask = function(subtask){
     Subtask.delete({taskId: taskId, id: subtask._id}, function(data){
-      console.log(data);
     });
   };
 
@@ -311,14 +304,12 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
     $scope.noResults = false;
     userEmail = $scope.searchUser;
     $http.get('api/users/email/' + userEmail).then(function(response){
-      console.log(response);
       if(!response.data){
         $scope.foundUser = "user not found";
         $scope.noResults = true;
         return;
       }else{
         for(var i=0; i<$scope.singleTask.users.length; i++){
-          console.log($scope.singleTask.users[i]._id);
           if($scope.singleTask.users[i]._id === response.data._id){
             $scope.foundUser = "you already share the task with this person";
             $scope.noResults = true;
@@ -335,9 +326,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
 
   //share task with a user
   $scope.share = function(user){
-    console.log(user._id);
     $http.put('api/users/' + user._id +'/task/' + taskId).then(function(data){
-      console.log("data: " + data);
       $scope.shareFormShow = false;
     });
   };
@@ -378,13 +367,10 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
 
   //emit the client if subtask deleted
   socket.on('deletedSubTask', function(deleteSubTask){
-    console.log("scope" + $scope.singleTask.subtasks);
-    console.log("deleted" + deleteSubTask);
     var foundSubTask = $scope.singleTask.subtasks.filter(function(subtask){
       return subtask._id === deleteSubTask._id;
     })[0];
     var indexOfDeletedSubTask= $scope.singleTask.subtasks.indexOf(foundSubTask);
-    console.log("index"+ indexOfDeletedSubTask);
     $scope.singleTask.subtasks.splice(indexOfDeletedSubTask,1);
   });
 
@@ -397,7 +383,6 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
 
   //emit the client if task deleted
   socket.on('deletedTask', function(deletedTask){
-    console.log(deletedTask);
     if($scope.singleTask._id === deletedTask._id){
       $location.path('/profile');
      }
@@ -405,7 +390,6 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
 
   //emit the client if task edited
   socket.on('editedTask', function(editedTask){
-    console.log(editedTask);
     if($scope.singleTask._id === editedTask._id){
       $scope.singleTask = editedTask;
      }
@@ -421,7 +405,6 @@ app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User',
   //update user
   $scope.updateUser = function(){
     User.update({id:$scope.currentUser._id}, $scope.edituser, function(data){
-      console.log(data);
       $scope.currentUser.displayName = data.displayName;
       $scope.currentUser.email = data.email;
       $location.path('/profile');
@@ -435,7 +418,6 @@ app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User',
   //delete user
   $scope.deletUser = function(){
     User.delete({id:$scope.currentUser._id}, function(data){
-      console.log(data);
       $scope.logout();
       $location.path('/');
     });
