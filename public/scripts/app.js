@@ -111,6 +111,7 @@ app.controller('MainCtrl', ['$scope', '$auth', '$location', '$http', 'Task', fun
     // send GET request to the api
     $http.get('/api/me').then(function(response){
       $scope.currentUser = response.data;
+      $location.path('/profile');
     }, function(err){
       console.log(err);
       $auth.removeToken();
@@ -158,10 +159,9 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', 'toastr', fu
       $scope.isAuthenticated();
       // clear signup form
       $scope.user = {};
-      // redirect to '/profile'
-      $location.path('/profile');
+
       }, function(err) {
-        toastr.error('Email or Password is incorrect', 'Error');
+        toastr.error('Please check that you entered in all the information correctly.', 'Error');
         console.log(err);
     });
   };
@@ -176,13 +176,11 @@ app.controller('AuthCtrl', ['$scope', '$auth', '$location', 'Task', 'toastr', fu
       // call $scope.isAuthenticated to set $scope.currentUser
         $scope.isAuthenticated();
       // clear sign up form
-        $scope.user = {};
-      // redirect to '/profile'
-        $location.path('/profile');
+        $scope.user = {}; 
 
       }, function(err){
         console.log(err);
-        toastr.error('Please check that you insert all the dinformation correctly', 'Error');
+        toastr.error('Email or password is incorrect.', 'Error');
         console.log(err);
       });
     };
@@ -288,8 +286,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
   $scope.editSubTask = function(subtask){
     indexSubtask = $scope.singleTask.subtasks.indexOf(subtask);
     Subtask.update({taskId: taskId, id: subtask._id}, subtask.subTaskEdit, function(data){
-      subtask.subTaskEdit = {};
-      // $scope.singleTask.subtasks[indexSubtask].name = data.name;
+      $scope.singleTask.subtasks[indexSubtask].name = data.name;
       subtask[$scope.showForm] = false;
     });
   };
@@ -318,10 +315,18 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
       if(!response.data){
         $scope.foundUser = "user not found";
         $scope.noResults = true;
-      }
-      else{
+        return;
+      }else{
+        for(var i=0; i<$scope.singleTask.users.length; i++){
+          console.log($scope.singleTask.users[i]._id);
+          if($scope.singleTask.users[i]._id === response.data._id){
+            $scope.foundUser = "you already share the task with this person";
+            $scope.noResults = true;
+            return;
+          }  
+        }
         $scope.foundUser = response.data;
-        $scope.results = true; 
+        $scope.results = true;
       }
     }, function(err){
       console.log(err);
@@ -338,7 +343,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
   };
 
   $scope.editSubtaskForm = function(subtask){
-    subtask.subTaskEdit = subtask;
+    // subtask.subTaskEdit = subtask;
     if(subtask[$scope.showForm] === false){
       subtask[$scope.showForm] = true;
     }
@@ -420,10 +425,10 @@ app.controller('UsersEditCtrl', ['$scope', '$auth', '$location', 'Task', 'User',
       $scope.currentUser.displayName = data.displayName;
       $scope.currentUser.email = data.email;
       $location.path('/profile');
-      toastr.success('Your profile was updated', 'Updated!');
+      toastr.success('Your profile was updated.', 'Updated!');
     },
     function(err){
-      toastr.error("profile didn't update", 'Error');
+      toastr.error("Your profile didn't update.", 'Error');
     });  
   };
 

@@ -6,21 +6,25 @@
 					<h2 ng-hide="showEditTaskForm || shareFormShow">{{singleTask.name}} &nbsp &nbsp <a ng-click="shareTaskForm()" href="#"><i class="fa fa-share"></i>
 					</a>&nbsp &nbsp <a ng-click="editTaskForm()" href="#"><i class="fa fa-pencil"></i></a>&nbsp &nbsp <a ng-click="deleteTask()" href="#"><i class="fa fa-trash"></i></a></h2>
 					<div ng-hide="showEditTaskForm || shareFormShow"><small>Shared with:</small><small ng-repeat ="user in singleTask.users">{{user.displayName}}{{$last ? '' : ', '}} </small></div>
-						<form class="form-inline" ng-submit="updateTask()" ng-show="showEditTaskForm" name="updateTaskFrom">
+					<div class="updateTaskDiv" ng-show="showEditTaskForm">
+						<form class="form-inline" ng-submit="updateTask()" name="updateTaskFrom">
 							<div class="form-group">
-						    <input type="text" ng-model="editTask.name" class="form-control" name="editedTask" minlength="2" maxlength="15">
+						    <input type="text" ng-model="editTask.name" class="form-control" name="editedTask" placeholder="{{singleTask.name}}"minlength="2" maxlength="15">
 						  </div>
 						  <input type="submit" value="update" class="btn btn-info">
 						  <a ng-click="editTaskForm()" href="#" class="btn btn-info">X</a><br>
 							<span ng-show="updateTaskFrom.editedTask.$touched && (updateTaskFrom.editedTask.$error.minlength || updateTaskFrom.editedTask.$error.maxlength)">Task should be 2-15 charcters</span>
 						</form>
-						<form ng-submit="search()" class="form-inline" ng-show="shareFormShow">
+					</div>
+					<div class="shareTaskDiv" ng-show="shareFormShow">
+						<form ng-submit="search()" class="form-inline">
 							<div class="form-group">
 						    <input type="text" ng-model="searchUser" class="form-control" placeholder= "search a user (email)">
 							</div>
 						 	<input type="submit" value="search" class="btn btn-info">
 						 	<a ng-click="shareTaskForm()" href="#" class="btn btn-info">X</a>
 						</form>
+					</div>
 				</div>	
 			</div><br>
 			<div class="row" ng-show="results">
@@ -28,7 +32,7 @@
 					<a ng-show="shareFormShow" ng-click="share(foundUser)" href="#">{{foundUser.displayName}} (select)</a>
 				</div>
 			</div>
-			<div class="row " ng-show="shareFormShow">
+			<div class="row" ng-show="shareFormShow">
 				<div class="col-md-6 col-md-offset-3 text-center">
 					<p ng-show="noResults">{{foundUser}}</p>
 				</div><br><br>
@@ -46,36 +50,32 @@
 			</div><br><br>
 			<div class="row">
 				<div class="col-md-12">
-						<div ng-repeat = "subtask in singleTask.subtasks">
-							<div class="row">
-								<div class="col-xs-2 col-md-1 col-md-offset-2 col-sm-1 col-sm-offset-2">
-									<i ng-hide="subtask.completed" ng-click="completeSubTask(subtask)" class="fa fa-square-o check"></i>
-									<i ng-show="subtask.completed" ng-click="completeSubTask(subtask)" class="fa fa-check-square-o check"></i>
-								</div>
-								<div class="col-xs-6 col-md-5 col-sm-5">
-									<p ng-hide="subtask[showForm]">{{subtask.name}}</p>
-									<form ng-submit="editSubTask(subtask)" ng-show="subtask[showForm]" class="form-inline" name="editSubtask">
-										<div class="form-group">
-							    		<input type="text" ng-model="subtask.subTaskEdit.name" name="editedSubtask" class="form-control" minlength="2" maxlength="15">
-							  		</div>
-							  		<input type="submit" value="update" class="btn btn-info"><br>
-							  		<span ng-show="editSubtask.editedSubtask.$touched && (editSubtask.editedSubtask.$error.minlength || editSubtask.editedSubtask.$error.maxlength)">Subtask should be 2-15 charcters</span>
-									</form>
-								</div>
-								<div class="col-xs-4 col-md-2 col-sm-2 text-right">
-									<a ng-click="deleteSubTask(subtask)" href="#"><i class="fa fa-trash"></i></a>&nbsp &nbsp
-									<a ng-click="editSubtaskForm(subtask)" href="#"><i class="fa fa-pencil"></i></a>&nbsp &nbsp
-								</div>
-							</div>
+						<div ng-repeat = "subtask in singleTask.subtasks" class="subtaskDiv">
+							<span class="check-box">
+								<i ng-hide="subtask.completed" ng-click="completeSubTask(subtask)" class="fa fa-square-o check"></i>
+								<i ng-show="subtask.completed" ng-click="completeSubTask(subtask)" class="fa fa-check-square-o check"></i>
+							</span>
+							<span ng-hide="subtask[showForm]">{{subtask.name}}</span>
+							<form ng-submit="editSubTask(subtask)" ng-show="subtask[showForm]" class="subtask-edit" name="editSubtask" placeholder="{{subtask.name}}">
+								<div class="form-group">
+					    		<input type="text" ng-model="subtask.subTaskEdit.name" name="editedSubtask" class="form-control" minlength="2" maxlength="15">
+					  		</div>
+					  		<input type="submit" value="update" class="btn btn-info"><br>
+					  		<span ng-show="editSubtask.editedSubtask.$touched && (editSubtask.editedSubtask.$error.minlength || editSubtask.editedSubtask.$error.maxlength)">Subtask should be 2-15 charcters</span>
+							</form>
+							<span class="edit-delete">
+								<a ng-click="deleteSubTask(subtask)" href="#"><i class="fa fa-trash"></i></a>&nbsp &nbsp
+								<a ng-click="editSubtaskForm(subtask)" href="#"><i class="fa fa-pencil"></i></a>&nbsp &nbsp
+							</span>
 						</div>	
 						<div class="text-center">
 							<p ng-show="!singleTask.subtasks.length">You still don't have any subtask</p>
 						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 
 
 				

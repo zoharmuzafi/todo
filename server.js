@@ -193,7 +193,6 @@ app.get('/api/tasks/:id', function(req,res){
 app.delete('/api/tasks/:id', function(req, res){
   taskId = req.params.id;
   Task.findById(taskId, function(err, foundTask){
-    console.log(err, foundTask);
     io.emit('deletedTask', foundTask);
     Task.remove({_id:taskId}, function(err, deletedTask){
       res.json(deletedTask); 
@@ -245,7 +244,6 @@ app.delete('/api/tasks/:taskId/subtasks/:id', function(req, res){
   Task.findById(taskId, function(err, foundTask){
     var foundSubTask = foundTask.subtasks.id(subtaskId); 
     foundSubTask.remove(function(err, deletedSubTask){
-      console.log(foundSubTask);
       io.emit('deletedSubTask', foundSubTask);
     });
     foundTask.save(function(err, savedTask){
@@ -266,8 +264,7 @@ app.put('/api/tasks/:taskId/subtasks/:id', function(req, res){
       foundSubTask.completed = true;
     }else{
       foundSubTask.completed = false;
-    }
-      
+    }  
     foundTask.save(function(err, savedTask){
        console.log(err);
        io.emit('editSubTask', savedTask);

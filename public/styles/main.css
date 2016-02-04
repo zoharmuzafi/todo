@@ -35,11 +35,19 @@ body{
 	color: white;
 	margin-top: 3%;
 }
+.getStartedTitle:hover{
+	color: white;
+	background-color: #e60007;
+}
 .getStarted{
 	margin: 5% 0%;
 	background-color: #FF5A5F;
 	color: white;
 	padding: 2% 5%;
+}
+.getStarted:hover{
+	color: white;
+	background-color: #e60007;
 }
 .loginForm{
 	margin-top: 5%;
@@ -91,6 +99,29 @@ a{
 	padding: 0% 4% 5% 4%;
 	margin-top: 5%
 }
+.updateTaskDiv{
+	height: 117px;
+	padding-top: 5%;
+}
+.shareTaskDiv{
+	height: 76px;
+	padding-top: 5%;
+}
+.subtaskDiv{
+	height: 34px;
+}
+.check-box{
+	margin-right: 1%;
+}
+.edit-delete{
+	float: right;
+}
+.subtask-edit{
+	display: inline-block;
+}
+.subtask-edit .form-group{
+	display: inline-block;
+}
 @media(max-width: 800px){
 	.welcomeHeaderTitle {
     font-size: 25px;
@@ -101,6 +132,16 @@ a{
 	}
 	h2{
 		font-size: 20px;
+	}
+}
+@media(max-width: 650px){
+	.updateTaskDiv{
+		height: 175px;
+		padding-top: 5%;
+	}
+	.shareTaskDiv{
+	height: 134px;
+	padding-top: 15%;
 	}
 }
 
