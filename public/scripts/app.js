@@ -235,6 +235,20 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
     }
   });
 
+  //change subtask counter on profile page when another user add subtask
+  socket.on('addSubTask', function(task){
+    var taskId = task._id;
+    for(var i=0; i<task.users.length; i++){
+      if(task.users[i] === $scope.currentUser._id){
+        for(var j=0; j<$scope.tasks.length; j++){
+          if($scope.tasks[j]._id === taskId){
+            $scope.tasks[j].subtasks.push(task.subtasks[task.subtasks.length-1]); 
+            return;
+          }
+        }
+      }
+    }
+  });
 }]);
 
 //task show controller
@@ -363,6 +377,7 @@ app.controller('TasksShowCtrl', ['$scope', 'socket', '$auth', '$location', '$rou
     if($scope.singleTask._id === task._id){
       $scope.singleTask.subtasks.push(task.subtasks[task.subtasks.length-1]);
     }
+
   });
 
   //emit the client if subtask deleted

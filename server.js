@@ -133,7 +133,11 @@ app.put('/api/users/:id', function(req, res){
     foundUser.email = req.body.email || foundUser.email;
     foundUser.displayName = req.body.displayName || foundUser.displayName;
     foundUser.save(function(err, savedUpdatedUser){
-      res.json(savedUpdatedUser);
+      if (err) {
+        res.status(500).send({ message: err.message });
+      } else {
+        res.json(savedUpdatedUser);
+      }  
     });
   });
 });
