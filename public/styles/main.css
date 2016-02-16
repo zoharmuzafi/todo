@@ -133,6 +133,9 @@ a{
 	h2{
 		font-size: 20px;
 	}
+	.shareResultsDiv{
+		margin-top: 7%;
+	}
 }
 @media(max-width: 650px){
 	.updateTaskDiv{

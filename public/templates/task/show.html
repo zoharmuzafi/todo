@@ -27,12 +27,12 @@
 					</div>
 				</div>	
 			</div><br>
-			<div class="row" ng-show="results">
+			<div class="row shareResultsDiv" ng-show="results">
 				<div class="col-md-12 text-center foundUserDiv">
 					<a ng-show="shareFormShow" ng-click="share(foundUser)" href="#">{{foundUser.displayName}} (select)</a>
 				</div>
 			</div>
-			<div class="row" ng-show="shareFormShow">
+			<div class="row shareResultsDiv" ng-show="shareFormShow">
 				<div class="col-md-6 col-md-offset-3 text-center">
 					<p ng-show="noResults">{{foundUser}}</p>
 				</div><br><br>

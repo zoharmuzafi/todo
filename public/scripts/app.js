@@ -212,15 +212,24 @@ app.controller('ProfileCtrl', ['$scope', 'socket', '$auth', '$location', 'Task',
     }); 
   };
 
-   socket.on('addTask', function(task){
-    for(var i=0; i<task.users.length; i++){
-      if (task.users[i]._id === $scope.currentUser._id){
+  //emit the client when task added
+  socket.on('addTask', function(task){
+    var exist = false;
+    for(var i=0; i<$scope.tasks.length; i++){
+      if($scope.tasks[i]._id === task._id){
+        exist = true;
+        i=$scope.tasks.length;
+      }
+    }
+    for(var j=0; j<task.users.length; j++){
+      if ((task.users[j]._id === $scope.currentUser._id) && (!exist)){
         $scope.tasks.push(task);
       }
     }
   });
 
-   socket.on('deletedTask', function(deletedTask){
+  //emit the client when task deleted
+  socket.on('deletedTask', function(deletedTask){
     var indexOfDeletedTask = $scope.tasks.indexOf(deletedTask);
     $scope.tasks.splice(indexOfDeletedTask,1);
   });
